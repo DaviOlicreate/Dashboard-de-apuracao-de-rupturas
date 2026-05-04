@@ -14,4 +14,13 @@ export interface ApuracaoResult {
     loja: string;
     motivo: string;
   }[];
+  topProdutos: {
+    nome: string;
+    valor: number;
+    itens: number;
+  }[];
+  topMotivos: {
+    motivo: string;
+    quantidade: number;
+  }[];
 }

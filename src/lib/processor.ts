@@ -19,7 +19,10 @@ export async function processFile(buffers: Buffer[]): Promise<ApuracaoResult> {
   let totalLojas = new Set<string>();
   let totalItensRuptura = 0;
   let valorEstimadoPerdido = 0;
+  
   let lojasMap = new Map<string, { itens: number; valor: number }>();
+  let produtosMap = new Map<string, { itens: number; valor: number }>();
+  let motivosMap = new Map<string, number>();
   let amostras: any[] = [];
 
   // Data processing logic - flexible column matching
@@ -30,9 +33,9 @@ export async function processFile(buffers: Buffer[]): Promise<ApuracaoResult> {
       return foundKey ? row[foundKey] : undefined;
     };
 
-    const loja = getVal(['loja', 'filial', 'store']) || 'Loja Desconhecida';
-    const produto = getVal(['produto', 'descrição', 'item', 'mercadoria']) || 'Produto Desconhecido';
-    const motivo = getVal(['motivo', 'causa', 'status', 'justificativa']) || 'Ruptura Comercial';
+    const loja = getVal(['loja', 'filial', 'store', 'unidade']) || 'Loja Desconhecida';
+    const produto = getVal(['produto', 'descrição', 'item', 'mercadoria', 'sku']) || 'Produto Desconhecido';
+    const motivo = getVal(['motivo', 'causa', 'status', 'justificativa', 'tipo']) || 'Ruptura Comercial';
     
     // Parse value (could be a number or formatted string like R$ 10,00)
     let valorRaw = getVal(['valor', 'preço', 'custo', 'venda', 'total']);
@@ -51,10 +54,21 @@ export async function processFile(buffers: Buffer[]): Promise<ApuracaoResult> {
     totalItensRuptura++;
     valorEstimadoPerdido += valor;
 
+    // Aggregate by store
     const lojaStats = lojasMap.get(loja) || { itens: 0, valor: 0 };
     lojaStats.itens++;
     lojaStats.valor += valor;
     lojasMap.set(loja, lojaStats);
+
+    // Aggregate by product
+    const prodStats = produtosMap.get(produto) || { itens: 0, valor: 0 };
+    prodStats.itens++;
+    prodStats.valor += valor;
+    produtosMap.set(produto, prodStats);
+
+    // Aggregate by reason
+    const currentMotivo = motivosMap.get(motivo) || 0;
+    motivosMap.set(motivo, currentMotivo + 1);
 
     if (amostras.length < 10) {
       amostras.push({ loja, produto, motivo });
@@ -72,6 +86,17 @@ export async function processFile(buffers: Buffer[]): Promise<ApuracaoResult> {
     valor: stats.valor
   })).sort((a, b) => b.valor - a.valor);
 
+  const topProdutos = Array.from(produtosMap.entries()).map(([nome, stats]) => ({
+    nome: nome.substring(0, 30) + (nome.length > 30 ? '...' : ''),
+    valor: stats.valor,
+    itens: stats.itens
+  })).sort((a, b) => b.valor - a.valor).slice(0, 10); // Limit to top 10
+
+  const topMotivos = Array.from(motivosMap.entries()).map(([motivo, quantidade]) => ({
+    motivo: motivo.substring(0, 30) + (motivo.length > 30 ? '...' : ''),
+    quantidade
+  })).sort((a, b) => b.quantidade - a.quantidade).slice(0, 5); // Limit to top 5
+
   return {
     id: uuidv4(),
     createdAt: new Date().toISOString(),
@@ -79,6 +104,8 @@ export async function processFile(buffers: Buffer[]): Promise<ApuracaoResult> {
     totalItensRuptura,
     valorEstimadoPerdido,
     detalhesPorLoja,
-    amostraProblemas: amostras
+    amostraProblemas: amostras,
+    topProdutos,
+    topMotivos
   };
 }

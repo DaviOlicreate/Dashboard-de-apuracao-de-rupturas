@@ -6,6 +6,7 @@ import { ApuracaoResult } from "@/lib/types";
 import { Copy, Check, TrendingDown, PackageX, Store, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import LZString from "lz-string";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 function RelatorioContent() {
   const searchParams = useSearchParams();
@@ -86,7 +87,68 @@ function RelatorioContent() {
           </div>
         </div>
 
-        <h3>Compartilhar Apuração</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
+          <div className="card" style={{ padding: '1rem' }}>
+            <h3 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Top 10 Produtos (Impacto R$)</h3>
+            <div style={{ height: '300px', width: '100%' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data.topProdutos} layout="vertical" margin={{ left: 20, right: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
+                  <XAxis type="number" hide />
+                  <YAxis 
+                    dataKey="nome" 
+                    type="category" 
+                    width={100} 
+                    fontSize={10} 
+                    stroke="var(--foreground)"
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)}
+                    contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                  />
+                  <Bar dataKey="valor" fill="var(--danger)" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="card" style={{ padding: '1rem' }}>
+            <h3 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Motivos da Ruptura</h3>
+            <div style={{ height: '300px', width: '100%' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data.topMotivos}
+                    dataKey="quantidade"
+                    nameKey="motivo"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                  >
+                    {data.topMotivos.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'][index % 5]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.5rem', fontSize: '0.75rem' }}>
+                {data.topMotivos.map((entry, index) => (
+                  <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'][index % 5] }} />
+                    <span>{entry.motivo}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 style={{ marginTop: '3rem' }}>Compartilhar Apuração</h3>
         <p>Envie este link para a diretoria ou para o Alissandro analisar os resultados diretamente pelo celular.</p>
         <div className="share-box">
           <input
@@ -101,6 +163,26 @@ function RelatorioContent() {
           </button>
         </div>
       </div>
+
+      {data.totalLojas > 1 && (
+        <>
+          <h2>Comparativo por Loja</h2>
+          <div className="card" style={{ marginBottom: '2rem', height: '400px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data.detalhesPorLoja.slice(0, 10)}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                <XAxis dataKey="loja" fontSize={10} stroke="var(--foreground)" />
+                <YAxis fontSize={10} stroke="var(--foreground)" />
+                <Tooltip 
+                  formatter={(value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)}
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                />
+                <Bar dataKey="valor" fill="var(--primary)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </>
+      )}
 
       <h2>Detalhamento por Loja</h2>
       <div className="table-wrapper">
