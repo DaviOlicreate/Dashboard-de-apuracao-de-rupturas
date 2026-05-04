@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processFile } from '@/lib/processor';
-import { saveApuracao } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,10 +19,7 @@ export async function POST(req: NextRequest) {
     // Process file
     const apuracao = await processFile(buffers);
     
-    // Save to DB
-    await saveApuracao(apuracao);
-
-    return NextResponse.json({ success: true, id: apuracao.id });
+    return NextResponse.json({ success: true, data: apuracao });
   } catch (error: any) {
     console.error('Error in upload route:', error);
     return NextResponse.json({ error: error.message || 'Erro ao processar arquivo.' }, { status: 500 });

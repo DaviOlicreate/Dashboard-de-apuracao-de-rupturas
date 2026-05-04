@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { UploadCloud, Loader2, FileSpreadsheet } from "lucide-react";
+import LZString from "lz-string";
 
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
@@ -40,13 +41,14 @@ export default function Home() {
         body: formData,
       });
 
-      const data = await res.json();
+      const responseData = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Erro ao processar o arquivo.");
+        throw new Error(responseData.error || "Erro ao processar o arquivo.");
       }
 
-      router.push(`/relatorio/${data.id}`);
+      const compressedData = LZString.compressToEncodedURIComponent(JSON.stringify(responseData.data));
+      router.push(`/relatorio/view?data=${compressedData}`);
     } catch (err: any) {
       setError(err.message);
       setLoading(false);

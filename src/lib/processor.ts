@@ -1,6 +1,6 @@
 import * as xlsx from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
-import { ApuracaoResult } from './db';
+import { ApuracaoResult } from './types';
 
 export async function processFile(buffers: Buffer[]): Promise<ApuracaoResult> {
   let allData: any[] = [];
