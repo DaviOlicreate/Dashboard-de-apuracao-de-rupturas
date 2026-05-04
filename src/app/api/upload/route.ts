@@ -5,17 +5,20 @@ import { saveApuracao } from '@/lib/db';
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-    const file = formData.get('file') as File;
+    const files = formData.getAll('files') as File[];
     
-    if (!file) {
+    if (!files || files.length === 0) {
       return NextResponse.json({ error: 'Nenhum arquivo enviado.' }, { status: 400 });
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const buffers: Buffer[] = [];
+    for (const file of files) {
+      const arrayBuffer = await file.arrayBuffer();
+      buffers.push(Buffer.from(arrayBuffer));
+    }
 
     // Process file
-    const apuracao = await processFile(buffer);
+    const apuracao = await processFile(buffers);
     
     // Save to DB
     await saveApuracao(apuracao);

@@ -5,34 +5,34 @@ import { useRouter } from "next/navigation";
 import { UploadCloud, Loader2, FileSpreadsheet } from "lucide-react";
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+    if (e.target.files && e.target.files.length > 0) {
+      setFiles(Array.from(e.target.files));
       setError(null);
     }
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setFiles(Array.from(e.dataTransfer.files));
       setError(null);
     }
   };
 
   const processFile = async () => {
-    if (!file) return;
+    if (files.length === 0) return;
     setLoading(true);
     setError(null);
 
     const formData = new FormData();
-    formData.append("file", file);
+    files.forEach(file => formData.append("files", file));
 
     try {
       const res = await fetch("/api/upload", {
@@ -58,25 +58,28 @@ export default function Home() {
       <div className="card" style={{ textAlign: "center", marginTop: "2rem" }}>
         <h1>Apuração de Rupturas</h1>
         <p>
-          Faça upload da planilha enviada para gerar automaticamente o painel de impacto comercial.
+          Faça upload de uma ou mais planilhas para gerar automaticamente o painel de impacto consolidado.
         </p>
 
         <div
-          className={`upload-zone ${file ? "has-file" : ""}`}
+          className={`upload-zone ${files.length > 0 ? "has-file" : ""}`}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
         >
-          {file ? (
+          {files.length > 0 ? (
             <>
               <FileSpreadsheet className="upload-icon" />
-              <h2>{file.name}</h2>
-              <p>{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+              <h2>{files.length} arquivo(s) selecionado(s)</h2>
+              <p>
+                {files.map(f => f.name).slice(0, 3).join(", ")}
+                {files.length > 3 ? ` e mais ${files.length - 3}...` : ""}
+              </p>
             </>
           ) : (
             <>
               <UploadCloud className="upload-icon" />
-              <h2>Toque ou arraste o arquivo aqui</h2>
+              <h2>Toque ou arraste os arquivos aqui</h2>
               <p>Suporta .xlsx ou .csv</p>
             </>
           )}
@@ -86,6 +89,7 @@ export default function Home() {
             onChange={handleFileChange}
             accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
             style={{ display: "none" }}
+            multiple
           />
         </div>
 
@@ -95,14 +99,14 @@ export default function Home() {
           className="btn"
           style={{ marginTop: "2rem", width: "100%", display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem" }}
           onClick={processFile}
-          disabled={!file || loading}
+          disabled={files.length === 0 || loading}
         >
           {loading ? (
             <>
               <Loader2 className="animate-spin" /> Processando...
             </>
           ) : (
-            "Gerar Apuração"
+            "Gerar Apuração Consolidada"
           )}
         </button>
       </div>

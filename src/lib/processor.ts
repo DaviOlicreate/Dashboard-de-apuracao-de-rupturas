@@ -2,13 +2,18 @@ import * as xlsx from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
 import { ApuracaoResult } from './db';
 
-export async function processFile(buffer: Buffer): Promise<ApuracaoResult> {
-  const workbook = xlsx.read(buffer, { type: 'buffer' });
-  const sheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sheetName];
-  
-  // Convert to array of objects
-  const data = xlsx.utils.sheet_to_json<any>(worksheet);
+export async function processFile(buffers: Buffer[]): Promise<ApuracaoResult> {
+  let allData: any[] = [];
+
+  for (const buffer of buffers) {
+    const workbook = xlsx.read(buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const data = xlsx.utils.sheet_to_json<any>(worksheet);
+    allData = allData.concat(data);
+  }
+
+  const data = allData;
 
   // Initialize accumulators
   let totalLojas = new Set<string>();

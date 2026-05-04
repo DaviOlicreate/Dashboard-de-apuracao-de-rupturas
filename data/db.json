@@ -1,0 +1,68 @@
+[
+  {
+    "id": "cda25705-9328-4a37-8071-03b9e0478fd6",
+    "createdAt": "2026-05-04T12:07:51.386Z",
+    "totalLojas": 1,
+    "totalItensRuptura": 14,
+    "valorEstimadoPerdido": 273346.30601000006,
+    "detalhesPorLoja": [
+      {
+        "loja": "Loja Desconhecida",
+        "itens": 14,
+        "valor": 273346.30601000006
+      }
+    ],
+    "amostraProblemas": [
+      {
+        "loja": "Loja Desconhecida",
+        "produto": "PD PANETTONE SEU LUIZ FRUTAS 400G CX ",
+        "motivo": "Ruptura Comercial"
+      },
+      {
+        "loja": "Loja Desconhecida",
+        "produto": "PANET SEU LUIZ CHOC PREMIUM 400G CX ",
+        "motivo": "Ruptura Comercial"
+      },
+      {
+        "loja": "Loja Desconhecida",
+        "produto": "PD PANETONE DE FRUTAS C/CHOC KG SAO LUIZ ",
+        "motivo": "Ruptura Comercial"
+      },
+      {
+        "loja": "Loja Desconhecida",
+        "produto": "PANET SEU LUIZ CHOCOTTONE 400G CX ",
+        "motivo": "Ruptura Comercial"
+      },
+      {
+        "loja": "Loja Desconhecida",
+        "produto": "PD PANETTONE SEU LUIZ FRUTAS 100G SC ",
+        "motivo": "Ruptura Comercial"
+      },
+      {
+        "loja": "Loja Desconhecida",
+        "produto": "PANET SEU LUIZ TRUFADO CHOC KG ",
+        "motivo": "Ruptura Comercial"
+      },
+      {
+        "loja": "Loja Desconhecida",
+        "produto": "PD PANETTONE SEU LUIZ FRUTAS 400G SC ",
+        "motivo": "Ruptura Comercial"
+      },
+      {
+        "loja": "Loja Desconhecida",
+        "produto": "PD PANETONE TRUFADO DE GOTAS DE CHOC KG SAO LUIZ ",
+        "motivo": "Ruptura Comercial"
+      },
+      {
+        "loja": "Loja Desconhecida",
+        "produto": "PD BOLO RED VELVET KG SAO LUIZ ",
+        "motivo": "Ruptura Comercial"
+      },
+      {
+        "loja": "Loja Desconhecida",
+        "produto": "PANET SEU LUIZ TRUFADO LEITE COND KG ",
+        "motivo": "Ruptura Comercial"
+      }
+    ]
+  }
+]
