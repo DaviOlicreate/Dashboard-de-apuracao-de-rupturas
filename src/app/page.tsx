@@ -87,7 +87,7 @@ export default function Home() {
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            accept=".csv, .xlsx, .xls"
             style={{ display: "none" }}
             multiple
           />
