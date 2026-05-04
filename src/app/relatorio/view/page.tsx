@@ -103,7 +103,7 @@ function RelatorioContent() {
                     stroke="var(--foreground)"
                   />
                   <Tooltip 
-                    formatter={(value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)}
+                    formatter={(value: any) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value))}
                     contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
                   />
                   <Bar dataKey="valor" fill="var(--danger)" radius={[0, 4, 4, 0]} />
@@ -174,7 +174,7 @@ function RelatorioContent() {
                 <XAxis dataKey="loja" fontSize={10} stroke="var(--foreground)" />
                 <YAxis fontSize={10} stroke="var(--foreground)" />
                 <Tooltip 
-                  formatter={(value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)}
+                  formatter={(value: any) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value))}
                   contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
                 />
                 <Bar dataKey="valor" fill="var(--primary)" radius={[4, 4, 0, 0]} />
