@@ -1,116 +1,175 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { UploadCloud, Loader2, FileSpreadsheet } from "lucide-react";
-import LZString from "lz-string";
+import { TrendingDown, PackageX, Store, AlertTriangle } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import consolidado from "@/data/consolidado.json";
 
 export default function Home() {
-  const [files, setFiles] = useState<File[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFiles(Array.from(e.target.files));
-      setError(null);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setFiles(Array.from(e.dataTransfer.files));
-      setError(null);
-    }
-  };
-
-  const processFile = async () => {
-    if (files.length === 0) return;
-    setLoading(true);
-    setError(null);
-
-    const formData = new FormData();
-    files.forEach(file => formData.append("files", file));
-
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const responseData = await res.json();
-
-      if (!res.ok) {
-        throw new Error(responseData.error || "Erro ao processar o arquivo.");
-      }
-
-      const compressedData = LZString.compressToEncodedURIComponent(JSON.stringify(responseData.data));
-      router.push(`/relatorio/view?data=${compressedData}`);
-    } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
+  const data = consolidado;
 
   return (
     <div className="container">
-      <div className="card" style={{ textAlign: "center", marginTop: "2rem" }}>
-        <h1>Apuração de Rupturas</h1>
-        <p>
-          Faça upload de uma ou mais planilhas para gerar automaticamente o painel de impacto consolidado.
+      <div style={{ textAlign: "center", marginBottom: "2rem", marginTop: "2rem" }}>
+        <h1 style={{ color: "var(--primary)", fontSize: "2.5rem" }}>Painel Executivo de Rupturas</h1>
+        <p style={{ color: "#64748b", fontSize: "1.1rem" }}>
+          Relatório consolidado das apurações nas filiais 101, 102, 104, 106, 107 e 401.
         </p>
+      </div>
 
-        <div
-          className={`upload-zone ${files.length > 0 ? "has-file" : ""}`}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {files.length > 0 ? (
-            <>
-              <FileSpreadsheet className="upload-icon" />
-              <h2>{files.length} arquivo(s) selecionado(s)</h2>
-              <p>
-                {files.map(f => f.name).slice(0, 3).join(", ")}
-                {files.length > 3 ? ` e mais ${files.length - 3}...` : ""}
-              </p>
-            </>
-          ) : (
-            <>
-              <UploadCloud className="upload-icon" />
-              <h2>Toque ou arraste os arquivos aqui</h2>
-              <p>Suporta .xlsx ou .csv</p>
-            </>
-          )}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept=".csv, .xlsx, .xls"
-            style={{ display: "none" }}
-            multiple
-          />
+      <div className="card" style={{ marginBottom: "2rem", borderTop: "4px solid var(--danger)" }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--danger)' }}>
+          <AlertTriangle size={24} /> Alerta Crítico Diretoria
+        </h2>
+        <ul style={{ paddingLeft: '1.5rem', lineHeight: '1.8' }}>
+          <li><strong>Loja 107 (Laticínios):</strong> Setor operando <strong>EXCLUSIVAMENTE</strong> com marca Capelinha para Mussarela. Marcas como Nativille, São Félix e Santa Maria totalmente zeradas. Linha Nestlé (Chamy, Chandelle, Chambinho) com ruptura generalizada.</li>
+          <li><strong>Geral (Destilados):</strong> Ruptura crítica de Aguardente Pitú e Cachaça 51 em 4 das 6 filiais apuradas.</li>
+          <li><strong>Geral (Mercearia):</strong> Marcas líderes de Arroz (Gringo/Pindorama) e Leite em Pó (Ninho) com quebras constantes de estoque.</li>
+          <li><strong>BRF Congelados (Lojas 101 e 401):</strong> Falta extensa de mix (Lasanhota, Hambúrguer, Nuggets).</li>
+        </ul>
+      </div>
+
+      <div className="stats-grid">
+        <div className="stat-card">
+          <Store className="upload-icon" style={{ margin: "0 auto", color: "var(--foreground)" }} />
+          <div className="stat-value" style={{ color: "var(--foreground)" }}>{data.totalLojas}</div>
+          <div className="stat-label">Lojas Apuradas</div>
+        </div>
+        <div className="stat-card danger">
+          <PackageX className="upload-icon" style={{ margin: "0 auto", color: "var(--danger)" }} />
+          <div className="stat-value">{data.totalItensRuptura}</div>
+          <div className="stat-label">Itens Apontados em Ruptura</div>
+        </div>
+        <div className="stat-card danger">
+          <TrendingDown className="upload-icon" style={{ margin: "0 auto", color: "var(--danger)" }} />
+          <div className="stat-value" style={{ fontSize: "2rem" }}>
+            {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(data.valorEstimadoPerdido)}
+          </div>
+          <div className="stat-label">Valor Estimado Perdido / Risco R$</div>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
+        <div className="card" style={{ padding: '1rem' }}>
+          <h3 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Top 10 Categorias / Marcas (Impacto R$)</h3>
+          <div style={{ height: '350px', width: '100%' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data.topProdutos} layout="vertical" margin={{ left: 20, right: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
+                <XAxis type="number" hide />
+                <YAxis 
+                  dataKey="nome" 
+                  type="category" 
+                  width={140} 
+                  fontSize={10} 
+                  stroke="var(--foreground)"
+                />
+                <Tooltip 
+                  formatter={(value: any) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value))}
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                />
+                <Bar dataKey="valor" fill="var(--danger)" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        {error && <p style={{ color: "var(--danger)", marginTop: "1rem" }}>{error}</p>}
+        <div className="card" style={{ padding: '1rem' }}>
+          <h3 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Motivos da Ruptura (Raiz)</h3>
+          <div style={{ height: '350px', width: '100%' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data.topMotivos}
+                  dataKey="quantidade"
+                  nameKey="motivo"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                >
+                  {data.topMotivos.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6'][index % 4]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.5rem', fontSize: '0.75rem', marginTop: '1rem' }}>
+              {data.topMotivos.map((entry, index) => (
+                <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.5rem' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6'][index % 4] }} />
+                  <span>{entry.motivo}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <button
-          className="btn"
-          style={{ marginTop: "2rem", width: "100%", display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem" }}
-          onClick={processFile}
-          disabled={files.length === 0 || loading}
-        >
-          {loading ? (
-            <>
-              <Loader2 className="animate-spin" /> Processando...
-            </>
-          ) : (
-            "Gerar Apuração Consolidada"
-          )}
-        </button>
+      <h2 style={{ marginTop: '3rem' }}>Comparativo: Risco por Filial</h2>
+      <div className="card" style={{ marginBottom: '2rem', height: '400px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data.detalhesPorLoja}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+            <XAxis dataKey="loja" fontSize={11} stroke="var(--foreground)" />
+            <YAxis fontSize={11} stroke="var(--foreground)" />
+            <Tooltip 
+              formatter={(value: any) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value))}
+              contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+            />
+            <Bar dataKey="valor" fill="var(--primary)" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <h2>Detalhamento por Loja</h2>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Loja / Filial</th>
+              <th>Total de Itens Apontados</th>
+              <th>Valor de Risco Calculado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.detalhesPorLoja.map((loja, i) => (
+              <tr key={i}>
+                <td style={{ fontWeight: 500 }}>{loja.loja}</td>
+                <td>{loja.itens} itens indisponíveis</td>
+                <td style={{ color: "var(--danger)", fontWeight: 600 }}>
+                  {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(loja.valor)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 style={{ marginTop: '2rem' }}>Amostra de Produtos (Impacto Severo no Cliente)</h2>
+      <p>Esses produtos são formadores de imagem e geram alto índice de reclamação e evasão quando faltam.</p>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Filial Afetada</th>
+              <th>Linha / Produto</th>
+              <th>Situação / Motivo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.amostraProblemas.map((item, i) => (
+              <tr key={i}>
+                <td style={{ fontWeight: 'bold' }}>{item.loja}</td>
+                <td>{item.produto}</td>
+                <td><span style={{ backgroundColor: "#fee2e2", color: "#991b1b", padding: "0.25rem 0.5rem", borderRadius: "999px", fontSize: "0.875rem", fontWeight: 500 }}>{item.motivo}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

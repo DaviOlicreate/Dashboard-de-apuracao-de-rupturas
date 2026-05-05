@@ -1,0 +1,40 @@
+{
+  "totalLojas": 6,
+  "lojasAvaliadas": ["101 (Matriz)", "102", "104", "106", "107", "401"],
+  "totalItensRuptura": 312,
+  "valorEstimadoPerdido": 425340.50,
+  "detalhesPorLoja": [
+    { "loja": "Loja 101 (Matriz)", "itens": 85, "valor": 125600.00 },
+    { "loja": "Loja 107", "itens": 62, "valor": 98450.20 },
+    { "loja": "Loja 401", "itens": 58, "valor": 76300.00 },
+    { "loja": "Loja 104", "itens": 45, "valor": 54100.80 },
+    { "loja": "Loja 106", "itens": 35, "valor": 42000.00 },
+    { "loja": "Loja 102", "itens": 27, "valor": 28889.50 }
+  ],
+  "amostraProblemas": [
+    { "produto": "Queijo Mussarela (Nativille, São Félix)", "loja": "107", "motivo": "Falta de Fornecimento / Apenas 1 marca disponível" },
+    { "produto": "Laticínios Nestlé (Iogurtes, Chambinho, Chandelle)", "loja": "107", "motivo": "Estoque Zerado / Falta de Entrega" },
+    { "produto": "Aguardente Pitú / Cachaça 51", "loja": "101, 106, 107, 401", "motivo": "Ruptura Comercial Crítica" },
+    { "produto": "Leite Ninho / Mucilon / Neston", "loja": "101, 106", "motivo": "Alta Demanda / Ruptura de Gondola" },
+    { "produto": "Salgadinhos Elma Chips (Doritos, Cheetos)", "loja": "106, 107, 401", "motivo": "Ruptura Comercial" },
+    { "produto": "Carnes BRF (Sadia/Perdigão)", "loja": "101, 401", "motivo": "Falta Extensa de Mix de Congelados" },
+    { "produto": "Cervejas (Amstel, Itaipava, Skol)", "loja": "101, 106", "motivo": "Baixo Estoque / Risco Iminente" },
+    { "produto": "Arroz Gringo / Pindorama", "loja": "102, 107, 401", "motivo": "Ruptura Comercial" }
+  ],
+  "topProdutos": [
+    { "nome": "Queijo Mussarela (Diversos)", "valor": 85000, "itens": 15 },
+    { "nome": "Destilados (Pitú, 51, Vodkas)", "valor": 72000, "itens": 42 },
+    { "nome": "Laticínios Nestlé", "valor": 55000, "itens": 38 },
+    { "nome": "Carnes/Frios BRF", "valor": 48000, "itens": 55 },
+    { "nome": "Cervejas em Lata", "valor": 45000, "itens": 18 },
+    { "nome": "Arroz (Diversas Marcas)", "valor": 35000, "itens": 22 },
+    { "nome": "Limpeza (Água Sanit., Sabão)", "valor": 28000, "itens": 30 },
+    { "nome": "Salgadinhos Elma Chips", "valor": 22000, "itens": 28 }
+  ],
+  "topMotivos": [
+    { "motivo": "Ruptura Comercial (Falta CD/Fornecedor)", "quantidade": 185 },
+    { "motivo": "Estoque Virtual (Erro de Inventário)", "quantidade": 52 },
+    { "motivo": "Atraso na Entrega (Laticínios)", "quantidade": 45 },
+    { "motivo": "Falta de Cadastro / Negociação", "quantidade": 30 }
+  ]
+}
